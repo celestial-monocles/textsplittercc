@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -50,7 +51,6 @@
       margin-top: 2em;
       margin-bottom: 2em;
     }
-
     .split-group {
       display: flex;
       flex-direction: column;
@@ -67,7 +67,6 @@
       font-size: 0.8em;
       height: 7px;
     }
-
     .split-group input {
       width: auto;
       margin: 0;
@@ -79,7 +78,6 @@
       margin: 0;
       font-weight: bold;
     }
-
     #outputContainer {
       display: flex;
       flex-direction: column;
@@ -102,13 +100,11 @@
       align-self: flex-end;
       font-weight: bold;
     }
-
     #charCount {
       color: white;
       font-size: 0.9em;
       margin-top: 10px;
     }
-
     @media (max-width: 768px) {
       label,
       textarea,
@@ -117,19 +113,16 @@
       .output-container {
         width: 100%;
       }
-
       .dropdown {
         top: 10px;
         right: 10px;
       }
     }
-
     h1,
     h2 {
       color: #DFB4DA;
       text-align: center;
     }
-
     .dropdown {
       position: absolute;
       top: -35px;
@@ -145,17 +138,14 @@
       box-shadow: 0 0 1px 3px rgba(255, 194, 198, 0.3);
       transition: background-color 0.3s;
     }
-
     .dropdown .icon {
       font-size: 24px;
       color: white;
       transition: transform 0.2s ease-in-out;
     }
-
     .dropdown:hover .icon {
       transform: scale(1.2);
     }
-
     .dropdown-content {
       display: none;
       position: absolute;
@@ -169,12 +159,10 @@
       opacity: 0;
       transition: opacity 0.3s ease;
     }
-
     .dropdown.show .dropdown-content {
       display: block;
       opacity: 1;
     }
-
     .dropdown-content a {
       color: white;
       padding: 8px 12px;
@@ -182,11 +170,9 @@
       text-align: center;
       display: block;
     }
-
     .dropdown-content a:hover {
       background-color: #DFB4DA;
     }
-
     .dropdown-content .home {
       font-weight: bold;
     }
@@ -208,87 +194,72 @@
       <a href="https://celestial-monocles.github.io/readaloud/">Read Aloud Tool</a>
     </div>
   </div>
-
   <h1 style="text-align: center;">Text Splitter</h1>
-
   <div class="form-group">
     <label for="inputText">Easily divide text into smaller parts, customize splits, add line gaps, and copy outputs.</label>
     <textarea id="inputText" rows="10" placeholder="Paste your text here..." oninput="updateCharCount()"></textarea>
     <div id="charCount">Character Count: 0</div>
   </div>
-
   <div class="form-group split-group">
     <div class="row">
       <label for="splitNumber">Enter number of splits:</label>
     </div>
     <input id="splitNumber" type="number" min="1" placeholder="2">
-
     <div class="row">
       <label for="lineGap">Line Gaps</label>
       <input id="lineGap" type="checkbox">
     </div>
-
     <button onclick="splitText()">Split Text</button>
   </div>
-
   <hr>
-
   <h2>Split Text Outputs</h2>
   <div id="outputContainer"></div>
-
   <script>
+    function normalizeLineBreaks(text) {
+      return text
+        .replace(/[\u2028\u2029\u000B\u000C\u0085]/g, '\n') // normalize unusual breaks
+        .replace(/\r\n|\r|\n/g, '\n'); // normalize all breaks to \n
+    }
     function splitText() {
-      const text = document.getElementById('inputText').value.trim();
+      let text = normalizeLineBreaks(document.getElementById('inputText').value.trim());
       let numSplits = parseInt(document.getElementById('splitNumber').value);
       const lineGap = document.getElementById('lineGap').checked;
-
       if (isNaN(numSplits) || numSplits < 1) {
         numSplits = 2;
       }
-
       const outputContainer = document.getElementById('outputContainer');
       outputContainer.innerHTML = '';
-
       if (!text) {
         document.getElementById('inputText').placeholder = "Please provide valid input text.";
         return;
       }
-
       const lines = text.split('\n');
       const chunkSize = Math.ceil(lines.length / numSplits);
       let start = 0;
-
       for (let i = 0; i < numSplits; i++) {
         const chunk = lines.slice(start, start + chunkSize).join(lineGap ? '\n\n' : '\n');
         start += chunkSize;
-
         const container = document.createElement('div');
         container.className = 'output-container';
-
         const textBox = document.createElement('textarea');
         textBox.className = 'output-box';
         textBox.rows = 10;
         textBox.readOnly = true;
         textBox.value = chunk;
-
         const charCount = chunk.length;
-
         const charCountDiv = document.createElement('div');
         charCountDiv.className = 'charCount';
         charCountDiv.textContent = `Character Count: ${charCount}`;
-
         const copyButton = document.createElement('button');
         copyButton.className = 'copy-button';
         copyButton.textContent = 'Copy Text';
         copyButton.onclick = () => copyToClipboard(copyButton, chunk);
-
         container.appendChild(textBox);
         container.appendChild(charCountDiv);
         container.appendChild(copyButton);
         outputContainer.appendChild(container);
       }
     }
-
     function copyToClipboard(button, text) {
       navigator.clipboard.writeText(text).then(() => {
         button.textContent = 'Copied!';
@@ -299,20 +270,15 @@
         alert('Failed to copy text: ' + err);
       });
     }
-
-    // Function to update the character count in the input field
     function updateCharCount() {
       const text = document.getElementById('inputText').value;
       const charCount = text.length;
       document.getElementById('charCount').textContent = `Character Count: ${charCount}`;
     }
-
-    // Add event listeners to handle touch interaction
     const dropdown = document.getElementById('dropdownMenu');
     dropdown.addEventListener('click', () => {
       dropdown.classList.toggle('show');
     });
-
     document.addEventListener('click', (e) => {
       if (!dropdown.contains(e.target)) {
         dropdown.classList.remove('show');
