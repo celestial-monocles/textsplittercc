@@ -2,8 +2,8 @@
 
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Text Splitter</title>
   <style>
     body {
@@ -42,6 +42,7 @@
       border: none;
       padding: 10px;
       cursor: pointer;
+      font-weight: bold;
     }
     button:hover {
       background-color: #DFB4DA;
@@ -99,6 +100,7 @@
     .copy-button {
       align-self: flex-end;
       font-weight: bold;
+      cursor: pointer;
     }
     #charCount {
       color: white;
@@ -204,55 +206,69 @@
     <div class="row">
       <label for="splitNumber">Enter number of splits:</label>
     </div>
-    <input id="splitNumber" type="number" min="1" placeholder="2">
-    <div class="row">
+    <input id="splitNumber" type="number" min="1" placeholder="2" />
+    <div class="row" style="margin-top: 10px;">
       <label for="lineGap">Line Gaps</label>
-      <input id="lineGap" type="checkbox">
+      <input id="lineGap" type="checkbox" />
     </div>
-    <button onclick="splitText()">Split Text</button>
+    <div class="row" style="margin-top: 10px;">
+      <button onclick="splitText()">Split Text</button>
+      <button
+        id="clearButton"
+        onclick="clearInput()"
+        style="background-color: #e74c3c; margin-left: 10px;"
+      >
+        Clear Input
+      </button>
+    </div>
   </div>
-  <hr>
+  <hr />
   <h2>Split Text Outputs</h2>
   <div id="outputContainer"></div>
   <script>
     function normalizeLineBreaks(text) {
       return text
-        .replace(/[\u2028\u2029\u000B\u000C\u0085]/g, '\n') // normalize unusual breaks
-        .replace(/\r\n|\r|\n/g, '\n'); // normalize all breaks to \n
+        .replace(/[\u2028\u2029\u000B\u000C\u0085]/g, "\n") // normalize unusual breaks
+        .replace(/\r\n|\r|\n/g, "\n"); // normalize all breaks to \n
     }
     function splitText() {
-      let text = normalizeLineBreaks(document.getElementById('inputText').value.trim());
-      let numSplits = parseInt(document.getElementById('splitNumber').value);
-      const lineGap = document.getElementById('lineGap').checked;
+      let text = normalizeLineBreaks(
+        document.getElementById("inputText").value.trim()
+      );
+      let numSplits = parseInt(document.getElementById("splitNumber").value);
+      const lineGap = document.getElementById("lineGap").checked;
       if (isNaN(numSplits) || numSplits < 1) {
         numSplits = 2;
       }
-      const outputContainer = document.getElementById('outputContainer');
-      outputContainer.innerHTML = '';
+      const outputContainer = document.getElementById("outputContainer");
+      outputContainer.innerHTML = "";
       if (!text) {
-        document.getElementById('inputText').placeholder = "Please provide valid input text.";
+        document.getElementById("inputText").placeholder =
+          "Please provide valid input text.";
         return;
       }
-      const lines = text.split('\n');
+      const lines = text.split("\n");
       const chunkSize = Math.ceil(lines.length / numSplits);
       let start = 0;
       for (let i = 0; i < numSplits; i++) {
-        const chunk = lines.slice(start, start + chunkSize).join(lineGap ? '\n\n' : '\n');
+        const chunk = lines
+          .slice(start, start + chunkSize)
+          .join(lineGap ? "\n\n" : "\n");
         start += chunkSize;
-        const container = document.createElement('div');
-        container.className = 'output-container';
-        const textBox = document.createElement('textarea');
-        textBox.className = 'output-box';
+        const container = document.createElement("div");
+        container.className = "output-container";
+        const textBox = document.createElement("textarea");
+        textBox.className = "output-box";
         textBox.rows = 10;
         textBox.readOnly = true;
         textBox.value = chunk;
         const charCount = chunk.length;
-        const charCountDiv = document.createElement('div');
-        charCountDiv.className = 'charCount';
+        const charCountDiv = document.createElement("div");
+        charCountDiv.className = "charCount";
         charCountDiv.textContent = `Character Count: ${charCount}`;
-        const copyButton = document.createElement('button');
-        copyButton.className = 'copy-button';
-        copyButton.textContent = 'Copy Text';
+        const copyButton = document.createElement("button");
+        copyButton.className = "copy-button";
+        copyButton.textContent = "Copy Text";
         copyButton.onclick = () => copyToClipboard(copyButton, chunk);
         container.appendChild(textBox);
         container.appendChild(charCountDiv);
@@ -261,27 +277,35 @@
       }
     }
     function copyToClipboard(button, text) {
-      navigator.clipboard.writeText(text).then(() => {
-        button.textContent = 'Copied!';
-        setTimeout(() => {
-          button.textContent = 'Copy Text';
-        }, 2000);
-      }).catch(err => {
-        alert('Failed to copy text: ' + err);
-      });
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          button.textContent = "Copied!";
+          setTimeout(() => {
+            button.textContent = "Copy Text";
+          }, 2000);
+        })
+        .catch((err) => {
+          alert("Failed to copy text: " + err);
+        });
     }
     function updateCharCount() {
-      const text = document.getElementById('inputText').value;
+      const text = document.getElementById("inputText").value;
       const charCount = text.length;
-      document.getElementById('charCount').textContent = `Character Count: ${charCount}`;
+      document.getElementById("charCount").textContent = `Character Count: ${charCount}`;
     }
-    const dropdown = document.getElementById('dropdownMenu');
-    dropdown.addEventListener('click', () => {
-      dropdown.classList.toggle('show');
+    function clearInput() {
+      document.getElementById("inputText").value = "";
+      updateCharCount();
+      document.getElementById("outputContainer").innerHTML = "";
+    }
+    const dropdown = document.getElementById("dropdownMenu");
+    dropdown.addEventListener("click", () => {
+      dropdown.classList.toggle("show");
     });
-    document.addEventListener('click', (e) => {
+    document.addEventListener("click", (e) => {
       if (!dropdown.contains(e.target)) {
-        dropdown.classList.remove('show');
+        dropdown.classList.remove("show");
       }
     });
   </script>
