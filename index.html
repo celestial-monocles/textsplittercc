@@ -216,7 +216,7 @@
       <button
         id="clearButton"
         onclick="clearInput()"
-        style="background-color: #e74c3c; margin-left: 10px;"
+        style="display: none; background-color: #e74c3c; margin-left: 10px;"
       >
         Clear Input
       </button>
@@ -293,6 +293,13 @@
       const text = document.getElementById("inputText").value;
       const charCount = text.length;
       document.getElementById("charCount").textContent = `Character Count: ${charCount}`;
+
+      const clearBtn = document.getElementById("clearButton");
+      if (charCount > 0) {
+        clearBtn.style.display = "inline-block";
+      } else {
+        clearBtn.style.display = "none";
+      }
     }
     function clearInput() {
       document.getElementById("inputText").value = "";
