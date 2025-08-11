@@ -2,498 +2,353 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Find and Replace</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Text Splitter</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: Georgia, serif;
-      margin: 20px;
-      padding: 20px;
-      background-color: #2a2a2a;
-      color: #B5AEE8;
+      font-family: Georgia, sans-serif;
+      background-color: #525253;
+      margin: 50px;
+      color: white;
+      position: relative;
     }
-
-    a {
-      color: #B5AEE8;
-      text-decoration: none;
-    }
-
-    #container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .find-replace-pair {
-      margin-bottom: 10px;
+    .form-group {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      background-color: #1f1f1f;
-      padding: 10px;
-      border-radius: 6px;
-    }
-
-    .find-replace-pair label {
-      margin-right: 10px;
-    }
-
-    .find-replace-pair input {
-      margin-right: 10px;
-    }
-
-    .remove-button {
-      margin-left: 10px;
-      color: red;
-      cursor: pointer;
-      font-weight: bold;
-      margin-top: 2px;
-    }
-
-    .drag-handle {
-      cursor: move;
-      margin-right: 10px;
-      font-size: 18px;
-      color: #B287CC;
-      user-select: none;
-    }
-
-    #inputAreaContainer {
       margin-bottom: 20px;
       position: relative;
     }
-
-    .toggles {
-      margin-bottom: 20px;
-    }
-
-    .toggles label {
-      margin-right: 15px;
-    }
-
-    textarea {
+    label {
+      margin-bottom: 10px;
+      font-size: 1.0em;
+      text-align: center;
       width: 100%;
-      font-family: monospace;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      resize: vertical;
     }
-
-    #inputText {
-      height: 150px;
-    }
-
-    #resultText {
-      background-color: #C7BAE3;
-      color: #000;
-      height: 150px;
-      border: none;
-      border-radius: 6px;
-      resize: vertical;
-    }
-
+    textarea,
+    input,
     button {
-      background-color: #B287CC;
+      width: 60%;
+      margin: 10px 0;
+      display: block;
+    }
+    textarea {
+      resize: vertical;
+    }
+    button {
+      width: auto;
+      background-color: #D482DD;
       color: white;
       border: none;
-      padding: 10px 20px;
-      margin: 5px;
-      border-radius: 6px;
+      padding: 10px;
       cursor: pointer;
       font-weight: bold;
-      font-family: inherit;
-      transition: background-color 0.2s ease;
     }
-
     button:hover {
-      background-color: #A84B8C;
+      background-color: #DFB4DA;
     }
-
-    #clearBtn {
-      background-color: #A84A46;
-      color: white;
+    hr {
+      background-color: white;
+      margin-top: 2em;
+      margin-bottom: 2em;
     }
-
-    #clearBtn:hover {
-      background-color: #A90101;
-    }
-
-    #scrollBtn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 99;
-      background-color: #B287CC;
-      color: white;
-      width: 48px;
-      height: 48px;
-      font-size: 24px;
-      font-weight: bold;
-      border-radius: 50%;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    .split-group {
       display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #replacementSection {
-      margin-top: 20px;
-      text-align: left;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       flex-direction: column;
+      align-items: center;
+      gap: 10px;
     }
-
-    #replacementDetails {
-      display: none;
+    .split-group .row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .split-group label[for="lineGap"] {
+      font-size: 0.8em;
+      height: 7px;
+    }
+    .split-group input {
+      width: auto;
+      margin: 0;
+      height: 30px;
+      text-align: center;
+    }
+    .split-group button {
+      width: auto;
+      margin: 0;
+      font-weight: bold;
+    }
+    #outputContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .output-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 60%;
+    }
+    .output-box {
+      width: 100%;
+      background-color: #E0D7DE;
+      resize: vertical;
+      margin-bottom: 10px;
+    }
+    .copy-button {
+      align-self: flex-end;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #charCount {
+      color: white;
+      font-size: 0.9em;
       margin-top: 10px;
     }
-
-    #toggleReplacementsBtn {
-      background-color: #2a2a2a;
-    }
-
-    #toggleFindReplaceBtn {
-      background-color: transparent;
-      color: #B5AEE8;
-      font-size: 1.2em;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
     #pasteBtn {
       position: absolute;
-      top: 10px;
-      right: 10px;
-      padding: 5px 10px;
+      top: 40px;
+      right: 21%;
+      padding: 8px 10px;
       font-size: 0.8em;
-      background-color: #B287CC;
+      background-color: #D482DD;
       z-index: 1;
+      width: auto;
     }
-
     #pasteBtn:hover {
-      background-color: #A84B8C;
+      background-color: #DFB4DA;
     }
-
     @media (max-width: 768px) {
-      .find-replace-pair {
-        flex-direction: column;
-        align-items: stretch;
-        text-align: left;
-      }
-
-      .find-replace-pair label,
-      .find-replace-pair input,
-      .remove-button,
-      .drag-handle {
-        width: 100%;
-        margin: 5px 0;
-      }
-
-      button {
-        width: 100%;
-        margin: 5px 0;
-      }
-
-      #copyButton {
+      label,
+      textarea,
+      input,
+      button,
+      .output-container {
         width: 100%;
       }
-
-      .toggles {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
+      .dropdown {
+        top: 10px;
+        right: 10px;
       }
-
-      .toggles label {
-        margin-bottom: 10px;
-      }
-
-      /* Fix for paste button in mobile */
       #pasteBtn {
         position: relative;
         top: auto;
         right: auto;
-        display: block;
-        width: auto;
+        width: 100%;
         margin: 5px 0;
-        text-align: center;
       }
-
-      #inputAreaContainer {
-        display: flex;
-        flex-direction: column;
-      }
+    }
+    h1,
+    h2 {
+      color: #DFB4DA;
+      text-align: center;
+    }
+    .dropdown {
+      position: absolute;
+      top: -35px;
+      right: -35px;
+      cursor: pointer;
+      border-radius: 50%;
+      background-color: #333;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 1px 3px rgba(255, 194, 198, 0.3);
+      transition: background-color 0.3s;
+    }
+    .dropdown .icon {
+      font-size: 24px;
+      color: white;
+      transition: transform 0.2s ease-in-out;
+    }
+    .dropdown:hover .icon {
+      transform: scale(1.2);
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 40px;
+      right: 0;
+      background-color: #D482DD;
+      min-width: 160px;
+      z-index: 1;
+      border-radius: 5px;
+      padding: 10px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .dropdown.show .dropdown-content {
+      display: block;
+      opacity: 1;
+    }
+    .dropdown-content a {
+      color: white;
+      padding: 8px 12px;
+      text-decoration: none;
+      text-align: center;
+      display: block;
+    }
+    .dropdown-content a:hover {
+      background-color: #DFB4DA;
+    }
+    .dropdown-content .home {
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div id="container">
-    <h1><a href="https://celestial-monocles.github.io/findandreplace/">Find and Replace Text</a></h1>
-
-    <div id="inputAreaContainer">
-      <textarea id="inputText" rows="10" placeholder="Enter your text here..."></textarea>
-      <button id="pasteBtn" title="Paste from clipboard">Paste</button>
+  <div class="dropdown" id="dropdownMenu">
+    <div class="icon">
+      <svg fill="#D482DD" height="20px" width="20px" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 486.196 486.196">
+        <g>
+          <path d="M481.708,220.456l-228.8-204.6c-0.4-0.4-0.8-0.7-1.3-1c-5-4.8-13-5-18.3-0.3l-228.8,204.6c-5.6,5-6,13.5-1.1,19.1 c2.7,3,6.4,4.5,10.1,4.5c3.2,0,6.4-1.1,9-3.4l41.2-36.9v7.2v106.8v124.6c0,18.7,15.2,34,34,34c0.3,0,0.5,0,0.8,0s0.5,0,0.8,0h70.6 c17.6,0,31.9-14.3,31.9-31.9v-121.3c0-2.7,2.2-4.9,4.9-4.9h72.9c2.7,0,4.9,2.2,4.9,4.9v121.3c0,17.6,14.3,31.9,31.9,31.9h72.2 c19,0,34-18.7,34-42.6v-111.2v-34v-83.5l41.2,36.9c2.6,2.3,5.8,3.4,9,3.4c3.7,0,7.4-1.5,10.1-4.5 C487.708,233.956,487.208,225.456,481.708,220.456z"></path>
+        </g>
+      </svg>
     </div>
-    <button id="clearBtn" onclick="clearInputText()">Clear Input</button>
-
-    <h2>
-      <button onclick="toggleFindReplaceSection()" id="toggleFindReplaceBtn">▼ Find and Replace List</button>
-    </h2>
-
-    <div id="findReplaceSection" style="display: block;">
-      <button onclick="exportList()">Export List</button>
-      <button onclick="importList()">Import List</button>
-      <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
-
-      <div id="findReplaceContainer"></div>
-      <button onclick="addFindReplacePair()">Add</button>
-      <button id="clearFindBtn" onclick="clearFindReplaceInputs()">Clear</button>
-
-      <div class="toggles">
-        <label><input type="checkbox" id="matchCase"> Match Case</label>
-        <label><input type="checkbox" id="wholeWords"> Whole Words</label>
-      </div>
+    <div class="dropdown-content">
+      <a href="https://celestial-monocles.github.io/" class="home">Home</a>
+      <a href="https://celestial-monocles.github.io/textsplitter/">Text Splitter</a>
+      <a href="https://celestial-monocles.github.io/textformatter/">Text Formatter</a>
+      <a href="https://celestial-monocles.github.io/readaloud/">Read Aloud Tool</a>
     </div>
-
-    <button onclick="replaceText()">Replace</button><br><br>
-
-    <h2>Result:</h2>
-    <textarea id="resultText" rows="10" readonly></textarea>
-    <button id="copyButton" onclick="copyResultText()" style="display:none">Copy Result</button>
   </div>
-
-  <div id="replacementSection">
-    <button id="toggleReplacementsBtn" onclick="toggleReplacements()" style="display:none;">- Replacements</button>
-    <div id="replacementDetails"></div>
+  <h1 style="text-align: center;">Text Splitter</h1>
+  <div class="form-group">
+    <label for="inputText">Easily divide text into smaller parts, customize splits, add line gaps, and copy outputs.</label>
+    <textarea id="inputText" rows="10" placeholder="Paste your text here..." oninput="updateCharCount()"></textarea>
+    <button id="pasteBtn" title="Paste from clipboard">Paste</button>
+    <div id="charCount">Character Count: 0</div>
   </div>
-
-  <button id="scrollBtn" onclick="toggleScroll()" title="Scroll">↓</button>
-
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-
+  <div class="form-group split-group">
+    <div class="row">
+      <label for="splitNumber">Enter number of splits:</label>
+    </div>
+    <input id="splitNumber" type="number" min="1" placeholder="2" />
+    <div class="row" style="margin-top: 10px;">
+      <label for="lineGap">Line Gaps</label>
+      <input id="lineGap" type="checkbox" />
+    </div>
+    <div class="row" style="margin-top: 10px;">
+      <button onclick="splitText()">Split Text</button>
+      <button
+        id="clearButton"
+        onclick="clearInput()"
+        style="display: none; background-color: #e74c3c; margin-left: 10px;"
+      >
+        Clear Input
+      </button>
+    </div>
+  </div>
+  <hr />
+  <h2>Split Text Outputs</h2>
+  <div id="outputContainer"></div>
   <script>
-    document.getElementById("inputText").addEventListener("keydown", function(event) {
-      if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault(); // Prevent newline
-        replaceText();
-      }
-    });
+    function normalizeLineBreaks(text) {
+      return text
+        .replace(/[\u2028\u2029\u000B\u000C\u0085]/g, "\n") // normalize unusual breaks
+        .replace(/\r\n|\r|\n/g, "\n"); // normalize all breaks to \n
+    }
 
     // Add paste functionality
     document.getElementById("pasteBtn").addEventListener("click", async function() {
       try {
         const text = await navigator.clipboard.readText();
         document.getElementById("inputText").value = text;
-        toggleCopyButtonVisibility();
+        updateCharCount();
       } catch (err) {
         alert("Failed to paste. Please ensure clipboard permissions are granted.");
         console.error("Failed to read clipboard contents:", err);
       }
     });
 
-    function escapeRegExp(string) {
-      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
-
-    function addFindReplacePair(find = '', replace = '') {
-      const container = document.getElementById('findReplaceContainer');
-      const div = document.createElement('div');
-      div.className = 'find-replace-pair';
-      div.innerHTML = `
-        <span class="drag-handle" title="Drag">☰</span>
-        <label>Find:</label><input class="find" value="${find}">
-        <label>Replace:</label><input class="replace" value="${replace}">
-        <span class="remove-button" onclick="removePair(this)">✖</span>
-      `;
-      container.appendChild(div);
-    }
-
-    function removePair(button) {
-      const container = document.getElementById('findReplaceContainer');
-      if (container.children.length > 1) button.parentElement.remove();
-      else alert("At least one pair must remain.");
-    }
-
-    function clearInputText() {
-      document.getElementById("inputText").value = '';
-      toggleCopyButtonVisibility();
-    }
-
-    function clearFindReplaceInputs() {
-      document.getElementById('findReplaceContainer').innerHTML = '';
-      addFindReplacePair();
-    }
-
-    function replaceText() {
-      let text = document.getElementById("inputText").value;
-
-      // Normalize line breaks
-      text = text.replace(/[\u2028\u2029\u0085\u000B\u000C]/g, '\n').replace(/\r\n|\r/g, '\n');
-
-      const finds = document.querySelectorAll('.find');
-      const replaces = document.querySelectorAll('.replace');
-      const matchCase = document.getElementById("matchCase").checked;
-      const wholeWords = document.getElementById("wholeWords").checked;
-      const flags = matchCase ? 'g' : 'gi';
-
-      const counts = [];
-
-      finds.forEach((findEl, i) => {
-        const find = findEl.value;
-        const replace = replaces[i].value;
-        if (find) {
-          let pattern = wholeWords ? `\\b${escapeRegExp(find)}\\b` : escapeRegExp(find);
-          try {
-            const regex = new RegExp(pattern, flags);
-            const matchCount = (text.match(regex) || []).length;
-            text = text.replace(regex, replace);
-            if (matchCount > 0) {
-              counts.push(`Replaced " ${find} " with " ${replace} " ${matchCount} time(s)`);
-            }
-          } catch (e) {
-            console.error(`Invalid pattern "${pattern}"`, e);
-          }
-        }
-      });
-
-      const resultText = document.getElementById("resultText");
-      resultText.value = text;
-      toggleCopyButtonVisibility();
-
-      const replacementDetails = document.getElementById("replacementDetails");
-      const toggleBtn = document.getElementById("toggleReplacementsBtn");
-
-      if (counts.length > 0) {
-        replacementDetails.innerHTML = `➤ ` + counts.join('<br>➤ ');
-        toggleBtn.style.display = 'inline-block';
-        replacementDetails.style.display = 'none';
-        toggleBtn.textContent = "- Replacements";
-      } else {
-        replacementDetails.innerHTML = '';
-        toggleBtn.style.display = 'none';
+    function splitText() {
+      let text = normalizeLineBreaks(
+        document.getElementById("inputText").value.trim()
+      );
+      let numSplits = parseInt(document.getElementById("splitNumber").value);
+      const lineGap = document.getElementById("lineGap").checked;
+      if (isNaN(numSplits) || numSplits < 1) {
+        numSplits = 2;
+      }
+      const outputContainer = document.getElementById("outputContainer");
+      outputContainer.innerHTML = "";
+      if (!text) {
+        document.getElementById("inputText").placeholder =
+          "Please provide valid input text.";
+        return;
+      }
+      const lines = text.split("\n");
+      const chunkSize = Math.ceil(lines.length / numSplits);
+      let start = 0;
+      for (let i = 0; i < numSplits; i++) {
+        const chunk = lines
+          .slice(start, start + chunkSize)
+          .join(lineGap ? "\n\n" : "\n");
+        start += chunkSize;
+        const container = document.createElement("div");
+        container.className = "output-container";
+        const textBox = document.createElement("textarea");
+        textBox.className = "output-box";
+        textBox.rows = 10;
+        textBox.readOnly = true;
+        textBox.value = chunk;
+        const charCount = chunk.length;
+        const charCountDiv = document.createElement("div");
+        charCountDiv.className = "charCount";
+        charCountDiv.textContent = `Character Count: ${charCount}`;
+        const copyButton = document.createElement("button");
+        copyButton.className = "copy-button";
+        copyButton.textContent = "Copy Text";
+        copyButton.onclick = () => copyToClipboard(copyButton, chunk);
+        container.appendChild(textBox);
+        container.appendChild(charCountDiv);
+        container.appendChild(copyButton);
+        outputContainer.appendChild(container);
       }
     }
-
-    function toggleReplacements() {
-      const details = document.getElementById("replacementDetails");
-      const toggleBtn = document.getElementById("toggleReplacementsBtn");
-
-      if (details.style.display === "none") {
-        details.style.display = "block";
-        toggleBtn.textContent = "+ Replacements";
-      } else {
-        details.style.display = "none";
-        toggleBtn.textContent = "- Replacements";
-      }
-    }
-
-    function toggleCopyButtonVisibility() {
-      const resultText = document.getElementById("resultText");
-      const copyButton = document.getElementById("copyButton");
-      copyButton.style.display = resultText.value.trim() ? 'inline-block' : 'none';
-    }
-
-    function copyResultText() {
-      const resultText = document.getElementById("resultText");
-      const copyButton = document.getElementById("copyButton");
-
-      navigator.clipboard.writeText(resultText.value)
+    function copyToClipboard(button, text) {
+      navigator.clipboard
+        .writeText(text)
         .then(() => {
-          copyButton.textContent = "Copied!";
-          copyButton.disabled = true;
+          button.textContent = "Copied!";
           setTimeout(() => {
-            copyButton.textContent = "Copy Result";
-            copyButton.disabled = false;
+            button.textContent = "Copy Text";
           }, 2000);
         })
-        .catch(() => {
-          alert("Failed to copy. Please copy manually.");
+        .catch((err) => {
+          alert("Failed to copy text: " + err);
         });
     }
+    function updateCharCount() {
+      const text = document.getElementById("inputText").value;
+      const charCount = text.length;
+      document.getElementById("charCount").textContent = `Character Count: ${charCount}`;
 
-    function exportList() {
-      const pairs = Array.from(document.querySelectorAll('.find-replace-pair')).map(pair => {
-        return {
-          find: pair.querySelector('.find').value,
-          replace: pair.querySelector('.replace').value
-        };
-      });
-      const blob = new Blob([JSON.stringify(pairs, null, 2)], { type: 'application/json' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'find_replace_list.json';
-      a.click();
-    }
-
-    function importList() {
-      const input = document.getElementById('importFile');
-      input.value = '';
-      input.click();
-    }
-
-    function handleImport(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const list = JSON.parse(e.target.result);
-          if (!Array.isArray(list)) throw new Error("Invalid format");
-          const container = document.getElementById('findReplaceContainer');
-          container.innerHTML = '';
-          list.forEach(({ find, replace }) => addFindReplacePair(find, replace));
-        } catch (err) {
-          alert("Failed to import list. Ensure it's valid JSON.");
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    let atBottom = false;
-
-    function toggleScroll() {
-      if (atBottom) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+      const clearBtn = document.getElementById("clearButton");
+      if (charCount > 0) {
+        clearBtn.style.display = "inline-block";
       } else {
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-      }
-      atBottom = !atBottom;
-      document.getElementById("scrollBtn").textContent = atBottom ? "↑" : "↓";
-    }
-
-    function toggleFindReplaceSection() {
-      const section = document.getElementById("findReplaceSection");
-      const btn = document.getElementById("toggleFindReplaceBtn");
-
-      if (section.style.display === "none") {
-        section.style.display = "block";
-        btn.textContent = "▼ Find and Replace List";
-      } else {
-        section.style.display = "none";
-        btn.textContent = "▲ Find and Replace List";
+        clearBtn.style.display = "none";
       }
     }
-
-    new Sortable(document.getElementById('findReplaceContainer'), {
-      animation: 150,
-      handle: '.drag-handle',
+    function clearInput() {
+      document.getElementById("inputText").value = "";
+      updateCharCount();
+      document.getElementById("outputContainer").innerHTML = "";
+    }
+    const dropdown = document.getElementById("dropdownMenu");
+    dropdown.addEventListener("click", () => {
+      dropdown.classList.toggle("show");
     });
-
-    window.onload = () => {
-      addFindReplacePair();
-      toggleCopyButtonVisibility();
-    };
+    document.addEventListener("click", (e) => {
+      if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove("show");
+      }
+    });
   </script>
 </body>
 </html>
