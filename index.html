@@ -178,6 +178,7 @@
       padding: 5px 10px;
       font-size: 0.8em;
       background-color: #B287CC;
+      z-index: 1;
     }
 
     #pasteBtn:hover {
@@ -216,6 +217,22 @@
 
       .toggles label {
         margin-bottom: 10px;
+      }
+
+      /* Fix for paste button in mobile */
+      #pasteBtn {
+        position: relative;
+        top: auto;
+        right: auto;
+        display: block;
+        width: auto;
+        margin: 5px 0;
+        text-align: center;
+      }
+
+      #inputAreaContainer {
+        display: flex;
+        flex-direction: column;
       }
     }
   </style>
